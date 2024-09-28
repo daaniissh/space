@@ -3,7 +3,6 @@
 import adminBlogSubmit from '@/actions/admin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
@@ -12,6 +11,7 @@ import Markdown from '@/components/markdown';
 import { Checkbox } from '@/components/ui/checkbox';
 import { revalidatePathClient } from '@/helpers/revalidate-path-client';
 import PlusIcon from '@/components/icons/plus';
+import MarkdownEditor from '@/app/_components/_admin/markdown-editor';
 
 type Props = Partial<{
   id: number;
@@ -61,7 +61,7 @@ export default function AdminBlogForm({ id, title, tag, content, cover, draft = 
         {/* because then there will be no input with name attr */}
         <input type="hidden" name="content" value={contentState} />
 
-        <div className="grid w-full items-center gap-1.5">
+        <div className="flex w-full flex-col gap-1">
           <Input
             type="text"
             id="title"
@@ -72,7 +72,7 @@ export default function AdminBlogForm({ id, title, tag, content, cover, draft = 
           <p className="text-sm text-muted-foreground">{title}</p>
         </div>
         <div className="flex items-start gap-4">
-          <div className="grid w-full items-center gap-1.5">
+          <div className="flex w-full flex-col gap-1">
             <div className="relative flex items-center">
               <Input
                 ref={inputRef}
@@ -95,7 +95,7 @@ export default function AdminBlogForm({ id, title, tag, content, cover, draft = 
             <p className="text-sm text-muted-foreground">{cover ?? 'No cover provided'}</p>
           </div>
 
-          <div className="grid w-max items-center gap-1.5">
+          <div className="flex w-max flex-col items-center gap-1">
             <Input
               type="text"
               id="tag"
@@ -106,33 +106,24 @@ export default function AdminBlogForm({ id, title, tag, content, cover, draft = 
             <p className="text-sm text-muted-foreground">{tag}</p>
           </div>
         </div>
-        <div className="grid w-full gap-1.5">
-          <Tabs defaultValue="content">
-            <TabsList>
-              <TabsTrigger value="content">Content</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-            </TabsList>
-            <TabsContent value="content">
-              <Textarea
-                className="h-40"
-                placeholder="Type content here..."
-                id="content"
-                name="content"
-                value={contentState}
-                onChange={(e) => setContentState(e.target.value)}
-              />
-            </TabsContent>
-            <TabsContent value="preview">
-              <div className="rounded-md border border-input p-3">
-                {contentState ? (
-                  <Markdown markdown={contentState} />
-                ) : (
-                  <span className="text-sm">Nothing to preview...</span>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+        <Tabs defaultValue="content" className="w-full">
+          <TabsList>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="preview">Preview</TabsTrigger>
+          </TabsList>
+          <TabsContent value="content">
+            <MarkdownEditor content={contentState} setContent={setContentState} />
+          </TabsContent>
+          <TabsContent value="preview">
+            <div className="rounded-md border border-input p-3">
+              {contentState ? (
+                <Markdown markdown={contentState} />
+              ) : (
+                <span className="text-sm">Nothing to preview...</span>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
         <div className="flex gap-5">
           <div className="flex items-center gap-2">
             <Checkbox name="draft" id="draft" defaultChecked={draft} />
